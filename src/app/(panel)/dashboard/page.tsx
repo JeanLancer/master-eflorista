@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 
-import { CalendarDateRangePicker } from "@core/components/buttons/date-range-picker";
+import SalesTable from "@core/app/(panel)/dashboard/components/table/sales-table";
 import HeaderPage from "@core/components/page/header-page";
 import {
     Card,
@@ -10,21 +10,77 @@ import {
     CardTitle,
 } from "@core/components/ui/card";
 import { Tabs, TabsContent } from "@core/components/ui/tabs";
-import { Overview } from "./components/overview";
+import db from "@core/lib/db";
+import { numberToCurrency } from "@core/lib/utils";
+import { subMonths } from "date-fns";
 
 export const metadata: Metadata = {
     title: "Dashboard",
     description: "Example dashboard app built using the components.",
 };
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+    const lastSixMonthsTransactions = await db.transactions.findMany({
+        select: {
+            id: true,
+            code: true,
+            store_name: true,
+            customer_name: true,
+            total_amount: true,
+            status: true,
+            payment_type: true,
+            platform_name: true,
+            created_at: true,
+        },
+        where: {
+            AND: [
+                {
+                    created_at: {
+                        gte: subMonths(
+                            new Date(new Date().setHours(0, 0, 0, 0)),
+                            6
+                        ),
+                    },
+                },
+                {
+                    OR: [
+                        {
+                            status: "APROVADO",
+                        },
+                        {
+                            status: "COMPROVANTE_ENVIADO",
+                        },
+                    ],
+                },
+            ],
+        },
+    });
+
+    const totalSellSixMonths = lastSixMonthsTransactions.reduce(
+        (prev, curr) => {
+            return prev + Number(curr.total_amount);
+        },
+        0
+    );
+
+    const lastMonthTransactions = lastSixMonthsTransactions.filter(
+        (item) =>
+            item.created_at >=
+            subMonths(new Date(new Date().setHours(0, 0, 0, 0)), 1)
+    );
+
+    const todayTransactions = lastSixMonthsTransactions.filter(
+        (item) => item.created_at >= new Date(new Date().setHours(0, 0, 0, 0))
+    );
+
+    const todaySell = todayTransactions.reduce((prev, curr) => {
+        return prev + Number(curr.total_amount);
+    }, 0);
+
     return (
         <div className="w-full flex-col md:flex bg-background">
-            <HeaderPage title="Dashboard">
-                <div className="flex items-center space-x-2">
-                    <CalendarDateRangePicker />
-                </div>
-            </HeaderPage>
+            <HeaderPage title="Dashboard" />
+
             <Tabs defaultValue="overview" className="space-y-4">
                 <TabsContent value="overview" className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -48,11 +104,11 @@ export default function DashboardPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    R$ 45,231.89
+                                    {numberToCurrency(todaySell)}
                                 </div>
-                                <p className="text-xs text-muted-foreground">
+                                {/* <p className="text-xs text-muted-foreground">
                                     +20.1% último mês
-                                </p>
+                                </p> */}
                             </CardContent>
                         </Card>
                         <Card>
@@ -77,17 +133,17 @@ export default function DashboardPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    R$ 2.043.124,00
+                                    {numberToCurrency(totalSellSixMonths)}
                                 </div>
-                                <p className="text-xs text-muted-foreground">
+                                {/* <p className="text-xs text-muted-foreground">
                                     +180.1% último semestre
-                                </p>
+                                </p> */}
                             </CardContent>
                         </Card>
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                    Vendas
+                                    Vendas no Mês
                                 </CardTitle>
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -111,11 +167,11 @@ export default function DashboardPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    +12.234
+                                    +{lastMonthTransactions.length}
                                 </div>
-                                <p className="text-xs text-muted-foreground">
+                                {/* <p className="text-xs text-muted-foreground">
                                     +19% último mês
-                                </p>
+                                </p> */}
                             </CardContent>
                         </Card>
                         <Card>
@@ -139,26 +195,31 @@ export default function DashboardPage() {
                                 </svg>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">4</div>
+                                <div className="text-2xl font-bold">0</div>
                             </CardContent>
                         </Card>
                     </div>
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                        <Card className="col-span-7 md:col-span-4">
-                            <CardHeader>
-                                <CardTitle>Resumo</CardTitle>
-                            </CardHeader>
-                            <CardContent className="pl-2">
-                                <Overview />
-                            </CardContent>
-                        </Card>
-                        <Card className="col-span-7 md:col-span-3">
+                        <Card className="col-span-7 md:col-span-7">
                             <CardHeader>
                                 <CardTitle>Lista Vendas Recentes</CardTitle>
                                 <CardDescription>
-                                    Você fez 54 vendas hoje.
+                                    {`Você fez ${todayTransactions.length} vendas hoje.`}
                                 </CardDescription>
                             </CardHeader>
+                            <CardContent>
+                                <SalesTable
+                                    transactions={todayTransactions.map(
+                                        (sale) => {
+                                            return {
+                                                ...sale,
+                                                total_amount:
+                                                    sale.total_amount?.toString(),
+                                            };
+                                        }
+                                    )}
+                                />
+                            </CardContent>
                         </Card>
                     </div>
                 </TabsContent>
