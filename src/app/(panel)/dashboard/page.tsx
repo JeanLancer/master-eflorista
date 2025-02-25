@@ -1,5 +1,9 @@
 import { Metadata } from "next";
 
+import {
+    getLastSixMonthTransactions,
+    getTodayTransactions,
+} from "@core/app/(panel)/dashboard/actions";
 import SalesTable from "@core/app/(panel)/dashboard/components/table/sales-table";
 import HeaderPage from "@core/components/page/header-page";
 import {
@@ -10,7 +14,6 @@ import {
     CardTitle,
 } from "@core/components/ui/card";
 import { Tabs, TabsContent } from "@core/components/ui/tabs";
-import db from "@core/lib/db";
 import { numberToCurrency } from "@core/lib/utils";
 import { subMonths } from "date-fns";
 
@@ -20,48 +23,13 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-    const lastSixMonthsTransactions = await db.transactions.findMany({
-        select: {
-            id: true,
-            code: true,
-            store_name: true,
-            customer_name: true,
-            total_amount: true,
-            status: true,
-            payment_type: true,
-            platform_name: true,
-            created_at: true,
-        },
-        where: {
-            AND: [
-                {
-                    created_at: {
-                        gte: subMonths(
-                            new Date(new Date().setHours(0, 0, 0, 0)),
-                            6
-                        ),
-                    },
-                },
-                {
-                    OR: [
-                        {
-                            status: "APROVADO",
-                        },
-                        {
-                            status: "COMPROVANTE_ENVIADO",
-                        },
-                    ],
-                },
-            ],
-        },
-    });
+    const lastSixMonthsTransactions = await getLastSixMonthTransactions();
 
-    const totalSellSixMonths = lastSixMonthsTransactions.reduce(
-        (prev, curr) => {
+    const totalSellSixMonths = lastSixMonthsTransactions
+        .filter((item) => item.status !== "NEGADO")
+        .reduce((prev, curr) => {
             return prev + Number(curr.total_amount);
-        },
-        0
-    );
+        }, 0);
 
     const lastMonthTransactions = lastSixMonthsTransactions.filter(
         (item) =>
@@ -69,13 +37,13 @@ export default async function DashboardPage() {
             subMonths(new Date(new Date().setHours(0, 0, 0, 0)), 1)
     );
 
-    const todayTransactions = lastSixMonthsTransactions.filter(
-        (item) => item.created_at >= new Date(new Date().setHours(0, 0, 0, 0))
-    );
+    const todayTransactions = await getTodayTransactions();
 
-    const todaySell = todayTransactions.reduce((prev, curr) => {
-        return prev + Number(curr.total_amount);
-    }, 0);
+    const todaySell = todayTransactions
+        .filter((item) => item.status !== "NEGADO")
+        .reduce((prev, curr) => {
+            return prev + Number(curr.total_amount);
+        }, 0);
 
     return (
         <div className="w-full flex-col md:flex bg-background">

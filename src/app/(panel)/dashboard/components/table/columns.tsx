@@ -2,6 +2,7 @@ import { Badge } from "@core/components/ui/badge";
 import { numberToCurrency } from "@core/lib/utils";
 
 import { ColumnDef } from "@tanstack/react-table";
+import clsx from "clsx";
 
 export const columns: ColumnDef<object>[] = [
     {
@@ -30,7 +31,14 @@ export const columns: ColumnDef<object>[] = [
         header: "Status",
         cell: ({ row }) => {
             return (
-                <Badge className="bg-green-500">{row.getValue("status")}</Badge>
+                <Badge
+                    className={clsx("bg-orange-500", {
+                        "bg-green-500": row.getValue("status") === "APROVADO",
+                        "bg-red-500": row.getValue("status") === "NEGADO",
+                    })}
+                >
+                    {row.getValue("status")}
+                </Badge>
             );
         },
     },
