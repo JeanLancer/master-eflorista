@@ -3,6 +3,7 @@ import { numberToCurrency } from "@core/lib/utils";
 
 import { ColumnDef } from "@tanstack/react-table";
 import clsx from "clsx";
+import { format } from "date-fns";
 
 export const columns: ColumnDef<object>[] = [
     {
@@ -69,6 +70,17 @@ export const columns: ColumnDef<object>[] = [
                 <Badge className="bg-blue-500">
                     {row.getValue("platform_name")}
                 </Badge>
+            );
+        },
+    },
+    {
+        accessorKey: "created_at",
+        header: "Data/Hora",
+        cell: ({ row }) => {
+            return (
+                <span>
+                    {format(row.getValue("created_at"), "dd/MM/yy - HH:mm")}
+                </span>
             );
         },
     },
