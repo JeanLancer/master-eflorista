@@ -33,7 +33,7 @@ export const columns: ColumnDef<object>[] = [
         cell: ({ row }) => {
             return (
                 <Badge
-                    className={clsx("bg-orange-500", {
+                    className={clsx("bg-yellow-500", {
                         "bg-green-500": row.getValue("status") === "APROVADO",
                         "bg-red-500": row.getValue("status") === "NEGADO",
                     })}
@@ -55,9 +55,15 @@ export const columns: ColumnDef<object>[] = [
         accessorKey: "payment_type",
         header: "Pagamento",
         cell: ({ row }) => {
+            const payment: string = row.getValue("payment_type");
             return (
-                <Badge className="bg-blue-500">
-                    {row.getValue("payment_type")}
+                <Badge
+                    className={clsx({
+                        "bg-blue-500": payment === "CREDITCARD",
+                        "bg-purple-500": payment === "DEPOSIT",
+                    })}
+                >
+                    {payment}
                 </Badge>
             );
         },
@@ -67,7 +73,7 @@ export const columns: ColumnDef<object>[] = [
         header: "Plataforma",
         cell: ({ row }) => {
             return (
-                <Badge className="bg-blue-500">
+                <Badge className="bg-gray-900">
                     {row.getValue("platform_name")}
                 </Badge>
             );

@@ -1,11 +1,17 @@
+import { currentUser } from "@clerk/nextjs/server";
 import { AppSidebar } from "@core/components/sidebar/app-sidebar";
 import { SidebarProvider } from "@core/components/ui/sidebar";
+import { redirect } from "next/navigation";
 
-export default function PanelLayout({
+export default async function PanelLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const user = await currentUser();
+
+    if (!user) redirect("/");
+
     return (
         <SidebarProvider>
             <main className="w-screen h-screen flex">
