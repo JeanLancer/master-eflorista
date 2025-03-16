@@ -4,9 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { createStore } from "@core/app/(panel)/stores/actions";
+import { updateStores } from "@core/app/(panel)/stores/actions";
 import CurrencyInput from "@core/components/input/currency-input";
 import InputMask from "@core/components/input/input-mask";
+import SelectInput from "@core/components/input/select-input";
 import { Button } from "@core/components/ui/button";
 import {
     Form,
@@ -18,104 +19,75 @@ import {
     FormMessage,
 } from "@core/components/ui/form";
 import { Input } from "@core/components/ui/input";
-import { parseCurrency } from "@core/lib/utils";
+import { Store, UpdateStoreDTO } from "@core/lib/types";
+import { numberToCurrency, parseCurrency } from "@core/lib/utils";
 import { useToast } from "@core/providers/toast-provider";
 import { Separator } from "@radix-ui/react-dropdown-menu";
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 
-export const createStoreSchema = z
+export const updateStoreSchema = z
     .object({
         name: z.string().min(1, { message: "Preencha o nome da loja" }),
-        email: z
-            .string({
-                required_error: "Preencha o e-mail",
-            })
-            .email({ message: "Preencha um e-mail válido" }),
-        password: z.string().min(1, { message: "Preencha o campo senha" }),
-        confirm_password: z
-            .string()
-            .min(1, { message: "Preencha o campo confirmar senha" }),
-        document: z.string().optional(),
-        billing_amount: z.any(),
         city: z.string().optional(),
+        document: z.string().optional(),
         whatsapp: z.string().optional(),
+        billing_amount: z.any(),
+        payment_status: z.string(),
     })
     .transform((data) => {
         return {
             ...data,
             billing_amount: parseCurrency(data.billing_amount),
         };
-    })
-    .refine((data) => data.password === data.confirm_password, {
-        message: "As senhas não coincidem",
-        path: ["confirm_password"],
     });
 
-export function StoreForm() {
-    const router = useRouter();
+interface Props {
+    store: Store;
+}
+
+export function StoreEditForm({ store }: Props) {
     const { toast } = useToast();
 
-    const form = useForm<z.infer<typeof createStoreSchema>>({
-        resolver: zodResolver(createStoreSchema),
-        mode: "onChange",
+    const form = useForm<UpdateStoreDTO>({
+        resolver: zodResolver(updateStoreSchema),
         defaultValues: {
-            name: "",
-            email: "",
-            password: "",
-            confirm_password: "",
-            document: "",
-            billing_amount: "R$ 0,00" as any,
-            city: "",
-            whatsapp: "",
+            name: store.name || "",
+            city: store.city || "",
+            whatsapp: store.whatsapp || "",
+            payment_status: store.payment_status || "",
+            document: store.document || "",
+            billing_amount: numberToCurrency(
+                Number(store.billing_amount || 0)
+            ) as any,
         },
+        mode: "onChange",
     });
 
-    // const {
-    //     formState: { isSubmitting },
-    // } = form;
+    async function onSubmit(data: UpdateStoreDTO) {
+        const response = await updateStores(store.id, data);
 
-    const isSubmitting = true;
-
-    async function onSubmit(data: z.infer<typeof createStoreSchema>) {
-        const response = await createStore({
-            store: {
-                name: data.name,
-                document: data.document,
-                city: data.city,
-                whatsapp: data.whatsapp,
-                billing_amount: data.billing_amount,
-                payment_status: "PENDING",
-            },
-            user: {
-                email: data.email,
-                password: data.password,
-            },
-        });
-
-        if (response.status !== 201) {
+        if (response.status !== 200) {
             toast({
                 title: "Opps! Ocorreu um problema.",
                 description: "Não foi possível atualizar a loja.",
                 type: "error",
                 duration: 4000,
             });
+
+            return;
         }
 
         toast({
             title: "Ação Realizada.",
-            description: "Loja Criada com Sucesso",
+            description: "Loja Atualizada com Sucesso",
             type: "success",
             duration: 4000,
         });
-
-        router.push("/stores");
     }
 
     return (
         <div className="w-full flex flex-col max-w-[800px] gap-4">
             <div>
-                <h3 className="text-lg font-medium">Cadastrar Nova Loja</h3>
+                <h3 className="text-lg font-medium">{"Atualizar Loja"}</h3>
                 <p className="text-sm text-muted-foreground">
                     Preencha os dados da loja abaixo.
                 </p>
@@ -146,27 +118,13 @@ export function StoreForm() {
                         )}
                     />
 
-                    <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>E-mail do Admnistrador</FormLabel>
-                                <FormControl>
-                                    <Input {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
                     <div className="w-full flex gap-4">
                         <FormField
                             control={form.control}
-                            name="password"
+                            name="city"
                             render={({ field }) => (
                                 <FormItem className="w-1/2">
-                                    <FormLabel>Senha do Admnistrador</FormLabel>
+                                    <FormLabel>Cidade</FormLabel>
                                     <FormControl>
                                         <Input {...field} />
                                     </FormControl>
@@ -175,22 +133,6 @@ export function StoreForm() {
                             )}
                         />
 
-                        <FormField
-                            control={form.control}
-                            name="confirm_password"
-                            render={({ field }) => (
-                                <FormItem className="w-1/2">
-                                    <FormLabel>Confirmar Senha</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-
-                    <div className="w-full flex gap-4">
                         <InputMask
                             label="CNPJ"
                             name="document"
@@ -205,23 +147,34 @@ export function StoreForm() {
                     </div>
 
                     <div className="w-full flex gap-4">
+                        <div className="w-1/2">
+                            <SelectInput
+                                label="Status Pagamento"
+                                name="payment_status"
+                                options={[
+                                    {
+                                        label: "Pago",
+                                        value: "PAID",
+                                    },
+                                    {
+                                        label: "Pendente",
+                                        value: "PENDING",
+                                    },
+                                    {
+                                        label: "Cancelado",
+                                        value: "CANCELED",
+                                    },
+                                ]}
+                            />
+                        </div>
+
                         <CurrencyInput
                             name="billing_amount"
                             label="Mensalidade"
                         />
                     </div>
 
-                    <Button
-                        disabled={isSubmitting}
-                        type="submit"
-                        title={isSubmitting ? "Aguarde..." : "Cadastrar"}
-                    >
-                        {isSubmitting ? (
-                            <Loader2 className="animate-spin" />
-                        ) : (
-                            "Cadastrar"
-                        )}
-                    </Button>
+                    <Button type="submit">Atualizar</Button>
                 </form>
             </Form>
         </div>

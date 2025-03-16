@@ -3,7 +3,6 @@ import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import "./globals.css";
 
-import Toast from "@core/components/page/toast";
 import ToastProvider from "@core/providers/toast-provider";
 import localFont from "next/font/local";
 
@@ -27,10 +26,7 @@ export default function RootLayout({
         <ClerkProvider localization={ptBR}>
             <html lang="en">
                 <body className={`${centraFont.className}  antialiased`}>
-                    <ToastProvider>
-                        {children}
-                        <Toast />
-                    </ToastProvider>
+                    <ToastProvider>{children}</ToastProvider>
                 </body>
             </html>
         </ClerkProvider>

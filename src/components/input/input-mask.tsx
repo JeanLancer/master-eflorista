@@ -11,25 +11,36 @@ import { useFormContext } from "react-hook-form";
 interface Props {
     name: string;
     label?: string;
+    mask: string;
 }
 
-export default function CurrencyInput({ name, label }: Props) {
+export default function MaskedInput({ name, mask, label }: Props) {
     const { control, setValue } = useFormContext();
 
-    const formatCurrency = (val: string) => {
+    const applyMask = (val: string) => {
         const numericValue = val.replace(/\D/g, "");
-        const floatValue = parseFloat(numericValue) / 100;
+        let maskedValue = "";
+        let index = 0;
 
-        if (isNaN(floatValue)) return "";
+        for (const char of mask) {
+            if (char === "9") {
+                if (index < numericValue.length) {
+                    maskedValue += numericValue[index];
+                    index++;
+                } else {
+                    break;
+                }
+            } else {
+                maskedValue += char;
+            }
+        }
 
-        return floatValue.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-        });
+        return maskedValue;
     };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(name, formatCurrency(event.target.value));
+        const masked = applyMask(event.target.value);
+        setValue(name, masked);
     };
 
     return (
@@ -43,7 +54,7 @@ export default function CurrencyInput({ name, label }: Props) {
                         <Input
                             {...field}
                             onChange={handleChange}
-                            placeholder="R$ 0,00"
+                            placeholder={mask.replace(/9/g, "0")} // Mostra a máscara como placeholder
                         />
                     </FormControl>
                     <FormMessage />

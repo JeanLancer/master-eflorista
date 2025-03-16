@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
 import React, {
     createContext,
     useCallback,
     useContext,
     useEffect,
-    useState
-} from 'react';
+    useState,
+} from "react";
 
 type ToastData = {
-    type: 'success' | 'error' | 'warning' | 'info';
+    type: "success" | "error" | "warning" | "info";
     title: string;
     description: string;
     duration?: number;
@@ -26,7 +26,7 @@ export const ToastContext = createContext<ToastContextData>({
     isOpen: false,
     data: {} as ToastData,
     toast: (data: ToastData) => {},
-    close: () => {}
+    close: () => {},
 });
 
 interface Props {
@@ -69,6 +69,6 @@ export default function ToastProvider({ children }: Props) {
 export const useToast = () => {
     const context = useContext(ToastContext);
     if (!context)
-        throw new Error('useToast must be used within the modal provider');
+        throw new Error("useToast must be used within the modal provider");
     return context;
 };

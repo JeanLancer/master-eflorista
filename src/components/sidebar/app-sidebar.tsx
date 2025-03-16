@@ -56,6 +56,10 @@ const data = {
             isActive: false,
             items: [
                 {
+                    title: "Listagem",
+                    url: "/stores",
+                },
+                {
                     title: "Cadastrar Loja",
                     url: "/stores/register",
                 },

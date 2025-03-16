@@ -92,15 +92,12 @@ export function ApplicationForm({ store }: Props) {
 
                         <FormField
                             control={form.control}
-                            name="email"
+                            name="price"
                             render={({ field }) => (
                                 <FormItem className="w-full">
                                     <FormLabel>Preço</FormLabel>
                                     <FormControl>
-                                        <CurrencyInput
-                                            {...field}
-                                            type="number"
-                                        />
+                                        <CurrencyInput fields={field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
