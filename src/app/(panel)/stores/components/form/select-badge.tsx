@@ -68,6 +68,7 @@ export default function StoreSelectPaymentStatus({
             name: store.name || "",
             city: store.city || "",
             whatsapp: store.whatsapp || "",
+            payment_status: store.payment_status || "",
             billing_amount: numberToCurrency(
                 Number(store.billing_amount || 0)
             ) as any,
