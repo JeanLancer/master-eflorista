@@ -71,6 +71,12 @@ export default function StoreTable({ data }: Props) {
         },
     });
 
+    const numStoreDisabled = data.filter(
+        (store) => store.payment_status === "CANCELED"
+    ).length;
+
+    const numStoreEnabled = data.length - numStoreDisabled;
+
     return (
         <div className="w-full flex flex-col">
             <HeaderPage title="Listagem das Lojas" />
@@ -105,6 +111,10 @@ export default function StoreTable({ data }: Props) {
                                     />
                                 </div>
                             </div>
+                        </CardDescription>
+
+                        <CardDescription className="my-8 text-base">
+                            {`Lojas Ativas ${numStoreEnabled} - Lojas Inativas ${numStoreDisabled}`}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>

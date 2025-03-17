@@ -71,21 +71,19 @@ export function StoreForm() {
         },
     });
 
-    // const {
-    //     formState: { isSubmitting },
-    // } = form;
-
-    const isSubmitting = true;
+    const {
+        formState: { isSubmitting },
+    } = form;
 
     async function onSubmit(data: z.infer<typeof createStoreSchema>) {
         const response = await createStore({
             store: {
-                name: data.name,
-                document: data.document,
-                city: data.city,
-                whatsapp: data.whatsapp,
-                billing_amount: data.billing_amount,
-                payment_status: "PENDING",
+                name: data.name!,
+                document: data.document!,
+                city: data.city!,
+                whatsapp: data.whatsapp!,
+                billing_amount: data.billing_amount!,
+                payment_status: "PENDING" as string,
             },
             user: {
                 email: data.email,

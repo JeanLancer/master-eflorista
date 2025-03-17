@@ -1,8 +1,8 @@
 "use server";
 
-import { UpdateStoreDTO } from "@core/lib/types";
+import { CreateStoreDTO, UpdateStoreDTO } from "@core/lib/types";
 
-export async function createStore(data: UpdateStoreDTO) {
+export async function createStore(data: CreateStoreDTO) {
     const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_EFLORISTA_URL}/stores`,
         {

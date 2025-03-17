@@ -4,6 +4,11 @@ import { z } from "zod";
 export type CreateStoreDTO = {
     store: {
         name: string;
+        city: string;
+        whatsapp: string;
+        document: string;
+        billing_amount: number;
+        payment_status: string;
     };
     user: {
         email: string;
