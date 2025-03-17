@@ -64,7 +64,10 @@ export default function StoreSelectPaymentStatus({
         setValue(value);
 
         const data = updateStoreSchema.parse({
-            ...store,
+            document: store.document || "",
+            name: store.name || "",
+            city: store.city || "",
+            whatsapp: store.whatsapp || "",
             billing_amount: numberToCurrency(
                 Number(store.billing_amount || 0)
             ) as any,
