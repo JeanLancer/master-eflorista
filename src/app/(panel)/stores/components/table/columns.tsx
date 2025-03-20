@@ -1,3 +1,4 @@
+import BlockStoreButton from "@core/app/(panel)/stores/components/form/block-store-button";
 import StoreSelectPaymentStatus from "@core/app/(panel)/stores/components/form/select-badge";
 import { Button } from "@core/components/ui/button";
 import { Checkbox } from "@core/components/ui/checkbox";
@@ -13,6 +14,7 @@ import { Store } from "@core/lib/types";
 import { numberToCurrency } from "@core/lib/utils";
 
 import { ColumnDef } from "@tanstack/react-table";
+import clsx from "clsx";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 
@@ -63,15 +65,28 @@ export const columns: ColumnDef<Store>[] = [
     {
         accessorKey: "is_enable",
         header: "Situação",
-        cell: ({ row }) => (
-            <div>{row.getValue("document") || "Não Informado"}</div>
-        ),
+        cell: ({ row }) => {
+            const isEnable = row.getValue("is_enable");
+
+            return (
+                <div
+                    className={clsx({
+                        "text-green-500": isEnable,
+                        "text-red-500": !isEnable,
+                    })}
+                >
+                    {isEnable ? "Ativo" : "Inativo"}
+                </div>
+            );
+        },
     },
     {
         accessorKey: "comission",
         header: "Comissão %",
         cell: ({ row }) => (
-            <div>{`${parseFloat(row.getValue("comission")).toFixed(0)}%`}</div>
+            <div className="text-right">{`${parseFloat(
+                row.getValue("comission")
+            ).toFixed(0)}%`}</div>
         ),
     },
     {
@@ -130,9 +145,7 @@ export const columns: ColumnDef<Store>[] = [
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem>
-                                <Button className="bg-transparent text-red-500 px-0 hover:bg-transparent">
-                                    Bloquear Loja
-                                </Button>
+                                <BlockStoreButton store={row.original} />
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

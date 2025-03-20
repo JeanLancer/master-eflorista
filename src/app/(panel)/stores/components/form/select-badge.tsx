@@ -67,11 +67,11 @@ export default function StoreSelectPaymentStatus({
             document: store.document || "",
             name: store.name || "",
             city: store.city || "",
+            is_enable: store.is_enable || false,
             whatsapp: store.whatsapp || "",
             payment_status: store.payment_status || "",
-            billing_amount: numberToCurrency(
-                Number(store.billing_amount || 0)
-            ) as any,
+            billing_amount: numberToCurrency(Number(store.billing_amount || 0)),
+            comission: store.comission || 0,
         });
 
         const response = await updateStores(store.id, {

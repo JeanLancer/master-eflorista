@@ -28,7 +28,7 @@ import { Separator } from "@radix-ui/react-dropdown-menu";
 export const updateStoreSchema = z
     .object({
         name: z.string().min(1, { message: "Preencha o nome da loja" }),
-        is_enable: z.string(),
+        is_enable: z.any(),
         city: z.string().optional(),
         document: z.string().optional(),
         whatsapp: z.string().optional(),
@@ -41,7 +41,6 @@ export const updateStoreSchema = z
             ...data,
             is_enable: data.is_enable === "true",
             billing_amount: parseCurrency(data.billing_amount),
-            comission: parseCurrency(data.comission),
         };
     });
 
