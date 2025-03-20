@@ -61,13 +61,19 @@ export const columns: ColumnDef<Store>[] = [
         ),
     },
     {
-        accessorKey: "whatsapp",
-        header: "Whatsapp",
+        accessorKey: "is_enable",
+        header: "Situação",
         cell: ({ row }) => (
-            <div>{row.getValue("whatsapp") || "Não Informado"}</div>
+            <div>{row.getValue("document") || "Não Informado"}</div>
         ),
     },
-
+    {
+        accessorKey: "comission",
+        header: "Comissão %",
+        cell: ({ row }) => (
+            <div>{`${parseFloat(row.getValue("comission")).toFixed(0)}%`}</div>
+        ),
+    },
     {
         accessorKey: "billing_amount",
         header: "Mensalidade",
@@ -122,6 +128,11 @@ export const columns: ColumnDef<Store>[] = [
                                 <Link href={`/stores/edit/${storeId}`}>
                                     Editar Loja
                                 </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <Button className="bg-transparent text-red-500 px-0 hover:bg-transparent">
+                                    Bloquear Loja
+                                </Button>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

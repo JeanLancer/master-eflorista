@@ -21,8 +21,10 @@ export type Store = {
     id: string;
     name: string;
     city: string;
+    is_enable: boolean;
     whatsapp: string;
     document: string;
     billing_amount: string;
     payment_status: string;
+    comission: string;
 };

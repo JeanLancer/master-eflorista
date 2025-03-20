@@ -6,14 +6,20 @@ import {
     FormMessage,
 } from "@core/components/ui/form";
 import { Input } from "@core/components/ui/input";
+import clsx from "clsx";
 import { useFormContext } from "react-hook-form";
 
 interface Props {
     name: string;
     label?: string;
+    className?: string;
 }
 
-export default function CurrencyInput({ name, label }: Props) {
+export default function CurrencyInput({
+    name,
+    label,
+    className = "w-1/2",
+}: Props) {
     const { control, setValue } = useFormContext();
 
     const formatCurrency = (val: string) => {
@@ -37,7 +43,7 @@ export default function CurrencyInput({ name, label }: Props) {
             control={control}
             name={name}
             render={({ field }) => (
-                <FormItem className="w-1/2">
+                <FormItem className={clsx(className)}>
                     {label && <FormLabel>{label}</FormLabel>}
                     <FormControl>
                         <Input

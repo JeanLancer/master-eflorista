@@ -7,6 +7,7 @@ import { z } from "zod";
 import { updateStores } from "@core/app/(panel)/stores/actions";
 import CurrencyInput from "@core/components/input/currency-input";
 import InputMask from "@core/components/input/input-mask";
+import { RadioInput } from "@core/components/input/radio-input";
 import SelectInput from "@core/components/input/select-input";
 import { Button } from "@core/components/ui/button";
 import {
@@ -27,16 +28,20 @@ import { Separator } from "@radix-ui/react-dropdown-menu";
 export const updateStoreSchema = z
     .object({
         name: z.string().min(1, { message: "Preencha o nome da loja" }),
+        is_enable: z.string(),
         city: z.string().optional(),
         document: z.string().optional(),
         whatsapp: z.string().optional(),
         billing_amount: z.any(),
+        comission: z.any(),
         payment_status: z.string(),
     })
     .transform((data) => {
         return {
             ...data,
+            is_enable: data.is_enable === "true",
             billing_amount: parseCurrency(data.billing_amount),
+            comission: parseCurrency(data.comission),
         };
     });
 
@@ -52,12 +57,14 @@ export function StoreEditForm({ store }: Props) {
         defaultValues: {
             name: store.name || "",
             city: store.city || "",
+            is_enable: store.is_enable || false,
             whatsapp: store.whatsapp || "",
             payment_status: store.payment_status || "",
             document: store.document || "",
             billing_amount: numberToCurrency(
                 Number(store.billing_amount || 0)
             ) as any,
+            comission: Number(store.comission || 0),
         },
         mode: "onChange",
     });
@@ -117,6 +124,40 @@ export function StoreEditForm({ store }: Props) {
                             </FormItem>
                         )}
                     />
+
+                    <div className="w-full flex gap-4">
+                        <div className="w-1/2">
+                            <RadioInput
+                                label="Situação da Loja"
+                                name="is_enable"
+                                options={[
+                                    {
+                                        text: "Ativo",
+                                        value: "true",
+                                    },
+                                    {
+                                        text: "Inativo",
+                                        value: "false",
+                                    },
+                                ]}
+                                defaultValue={form.getValues("is_enable")}
+                            />
+                        </div>
+
+                        <FormField
+                            control={form.control}
+                            name="comission"
+                            render={({ field }) => (
+                                <FormItem className="w-1/2">
+                                    <FormLabel>Comissão %</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} type="number" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
 
                     <div className="w-full flex gap-4">
                         <FormField
