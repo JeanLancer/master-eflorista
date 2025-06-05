@@ -21,6 +21,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 
 interface IProps {
@@ -28,6 +29,7 @@ interface IProps {
 }
 
 export default function SalesTable({ transactions }: IProps) {
+    const router = useRouter();
     const [sales, setSales] = React.useState(transactions);
 
     const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -97,6 +99,11 @@ export default function SalesTable({ transactions }: IProps) {
                                     key={row.id}
                                     data-state={
                                         row.getIsSelected() && "selected"
+                                    }
+                                    onClick={() =>
+                                        router.push(
+                                            `/transactions/${row.original.id}`
+                                        )
                                     }
                                 >
                                     {row.getVisibleCells().map((cell) => (
