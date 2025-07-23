@@ -67,8 +67,8 @@ export function DataTable<TData, TValue>({
         getFacetedUniqueValues: getFacetedUniqueValues(),
         initialState: {
             pagination: {
-                pageIndex: 2, //custom initial page index
-                pageSize: 25, //custom default page size
+                pageIndex: 0, //custom initial page index
+                pageSize: 10, //custom default page size
             },
         },
     });
