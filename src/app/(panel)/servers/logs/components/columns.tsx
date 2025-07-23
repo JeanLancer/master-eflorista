@@ -48,7 +48,7 @@ export const columns: ColumnDef<Task>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "title",
+        accessorKey: "service_name",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="API" />
         ),
@@ -63,9 +63,7 @@ export const columns: ColumnDef<Task>[] = [
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Mensagem" />
         ),
-        cell: ({ row }) => (
-            <div className="w-[104px]">{row.original.message}</div>
-        ),
+        cell: ({ row }) => <div className="">{row.original.message}</div>,
         enableSorting: false,
         enableHiding: false,
     },
@@ -91,7 +89,7 @@ export const columns: ColumnDef<Task>[] = [
         },
     },
     {
-        accessorKey: "message",
+        accessorKey: "created_at",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Data" />
         ),

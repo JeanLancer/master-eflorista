@@ -4,7 +4,7 @@ import { columns } from "./components/columns";
 import { DataTable } from "./components/data-table";
 
 export default async function TaskPage() {
-    const logs = await getLogs({ limit: 10, page: 1 });
+    const logs = await getLogs({ limit: 200, page: 1 });
 
     return (
         <div className="w-full flex flex-col">

@@ -42,7 +42,7 @@ export default function Toast() {
                         {icons[data.type]}
                     </div>
                     <div className="w-full flex flex-col py-2">
-                        <span className="font-semibold text-sm text-gray-400">
+                        <span className="font-medium text-sm text-gray-400">
                             {data.title}
                         </span>
                         <p className="text-sm text-muted-foreground leading-4">

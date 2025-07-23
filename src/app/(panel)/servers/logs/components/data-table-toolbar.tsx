@@ -6,9 +6,6 @@ import { X } from "lucide-react";
 import { Button } from "@core/components/ui/button";
 import { Input } from "@core/components/ui/input";
 
-import { statuses } from "../data/data";
-import { DataTableFacetedFilter } from "./data-table-faceted-filter";
-
 interface DataTableToolbarProps<TData> {
     table: Table<TData>;
 }
@@ -25,23 +22,16 @@ export function DataTableToolbar<TData>({
                     placeholder="Filtrar erro..."
                     value={
                         (table
-                            .getColumn("title")
+                            .getColumn("service_name")
                             ?.getFilterValue() as string) ?? ""
                     }
                     onChange={(event) =>
                         table
-                            .getColumn("title")
+                            .getColumn("service_name")
                             ?.setFilterValue(event.target.value)
                     }
                     className="h-8 w-[150px] lg:w-[250px]"
                 />
-                {table.getColumn("status") && (
-                    <DataTableFacetedFilter
-                        column={table.getColumn("status")}
-                        title="Status"
-                        options={statuses}
-                    />
-                )}
                 {isFiltered && (
                     <Button
                         variant="ghost"

@@ -46,7 +46,7 @@ export function NavUser() {
                                 </AvatarFallback>
                             </Avatar>
                             <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-semibold">
+                                <span className="truncate font-medium">
                                     {user?.firstName}
                                 </span>
                                 <span className="truncate text-xs">
@@ -76,7 +76,7 @@ export function NavUser() {
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-semibold">
+                                    <span className="truncate font-medium">
                                         {user?.firstName}
                                     </span>
                                     <span className="truncate text-xs">

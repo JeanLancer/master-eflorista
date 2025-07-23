@@ -14,7 +14,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import * as React from "react";
+import { useState } from "react";
 
 import {
     Table,
@@ -25,6 +25,7 @@ import {
     TableRow,
 } from "@core/components/ui/table";
 
+import { LogDetailsModal } from "@core/app/(panel)/servers/logs/components/log-details-modal";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 
@@ -37,12 +38,12 @@ export function DataTable<TData, TValue>({
     columns,
     data,
 }: DataTableProps<TData, TValue>) {
-    const [rowSelection, setRowSelection] = React.useState({});
-    const [columnVisibility, setColumnVisibility] =
-        React.useState<VisibilityState>({});
-    const [columnFilters, setColumnFilters] =
-        React.useState<ColumnFiltersState>([]);
-    const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [rowSelection, setRowSelection] = useState({});
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+        {}
+    );
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const [sorting, setSorting] = useState<SortingState>([]);
 
     const table = useReactTable({
         data,
@@ -64,7 +65,16 @@ export function DataTable<TData, TValue>({
         getSortedRowModel: getSortedRowModel(),
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues(),
+        initialState: {
+            pagination: {
+                pageIndex: 2, //custom initial page index
+                pageSize: 25, //custom default page size
+            },
+        },
     });
+
+    const [selectedLog, setSelectedLog] = useState<any>(null);
+    const [open, setOpen] = useState(false);
 
     return (
         <div className="space-y-4">
@@ -101,6 +111,11 @@ export function DataTable<TData, TValue>({
                                     data-state={
                                         row.getIsSelected() && "selected"
                                     }
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                        setOpen(true);
+                                        setSelectedLog(row.original);
+                                    }}
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
@@ -126,6 +141,11 @@ export function DataTable<TData, TValue>({
                 </Table>
             </div>
             <DataTablePagination table={table} />
+            <LogDetailsModal
+                log={selectedLog}
+                open={open}
+                onOpenChange={setOpen}
+            />
         </div>
     );
 }
