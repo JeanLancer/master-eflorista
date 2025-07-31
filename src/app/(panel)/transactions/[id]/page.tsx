@@ -11,6 +11,8 @@ export default async function TransactionsPage({ params }: Props) {
     const { id } = await params;
     const transaction = await getTransactionById(id);
 
+    console.log(transaction)
+
     return (
         <Suspense fallback={<div>Carregando...</div>}>
             <div className="w-screen flex flex-col justify-center p-4 bg-white">

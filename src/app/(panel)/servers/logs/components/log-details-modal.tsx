@@ -56,10 +56,16 @@ export function LogDetailsModal({
                             )}
                         </div>
                         {log.data && (
-                            <div className="w-full max-h-[200px] flex flex-wrap border-[1px] rounded-md border-danger-600 overflow-y-auto">
-                                <p className="flex text-sm rounded mt-1 p-2">
-                                    {log.data}
-                                </p>
+                            <div className="w-full max-w-[39rem] max-h-[200px] flex flex-wrap whitespace-pre-wrap border-[1px] rounded-md border-danger-600 overflow-y-auto">
+                                {log.service_name === 'API-Eflorista'  ?(
+                                    <p className="flex text-sm rounded mt-1 p-2">
+                                        {log.data}
+                                    </p>
+                                ) : (
+                                    <pre className="flex text-sm rounded mt-1 p-2">
+                                        {JSON.stringify(log.data, null, 4)}
+                                    </pre> 
+                                )}
                             </div>
                         )}
                     </DialogDescription>
